@@ -5,7 +5,7 @@ public class Loader {
         AESCipher cipher = new AESCipher();
 
         String text = "Something new more thn 16 symbols";
-        String key = "some 16 symbols";
+        String key = "some 16 symbols.";
 
         byte[] cipherBytes = cipher.encryptMessage(text, key);
         String originalMessage = cipher.decryptMessage(cipherBytes, key);
