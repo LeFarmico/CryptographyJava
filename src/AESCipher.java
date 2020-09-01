@@ -3,44 +3,58 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.Arrays;
+import java.util.Base64;
 
 public class AESCipher implements MessageEncryption {
 
-    @Override
-    public byte[] encryptMessage(String message, String key) throws GeneralSecurityException {
+    private static SecretKeySpec spec;
+
+    public static void setKey(String keyString) throws NoSuchAlgorithmException {
 
         //Создание байт ключа на основе key
-        byte[] rawKey = key.getBytes(StandardCharsets.UTF_8);
+        byte[] rawKey = keyString.getBytes(StandardCharsets.UTF_8);
         if (rawKey.length != 16) {
             throw new IllegalArgumentException("Invalid key size.");
         }
 
+        //MessageDigest будет проверять ключ на целостность
+        MessageDigest sha = MessageDigest.getInstance("SHA-256");
+
+        //Вычисляем дайджест
+        rawKey = sha.digest(rawKey);
+        rawKey = Arrays.copyOf(rawKey, 16);
+
         //Используем этот класс для создание итогового ключа на основе rawKey
-        SecretKeySpec spec = new SecretKeySpec(rawKey, "AES");
+        spec = new SecretKeySpec(rawKey, "AES");
+    }
+
+    @Override
+    public String encryptMessage(String message, String key) throws GeneralSecurityException {
+
+        setKey(key);
 
         //Инициализируем шифр
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
 
         //IvParameterSpec используется при CBC, DES, RSA шифровании
         cipher.init(Cipher.ENCRYPT_MODE, spec, new IvParameterSpec(new byte[16]));
-        return  cipher.doFinal(message.getBytes(StandardCharsets.UTF_8));
+
+        //Кодируем указанный массив байтов в строку с использованием схемы кодирования Base64.
+        return  Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
 
     }
 
     @Override
-    public String decryptMessage(byte[] encrypted, String key) throws GeneralSecurityException {
-        byte[] rawKey = key.getBytes(StandardCharsets.UTF_8);
+    public String decryptMessage(String encryptedMessage, String key) throws GeneralSecurityException {
 
-        //Используем этот класс для создание итогового ключа на основе rawKey
-        SecretKeySpec spec =new SecretKeySpec(rawKey, "AES");
+        setKey(key);
 
         //Инициализируем шифр
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(new byte[16]));
 
-        //Расшифровываем
-        byte[] originalMessage = cipher.doFinal(encrypted);
-
-        return new String(originalMessage, StandardCharsets.UTF_8);
+        //Декодируем указанный массив байтов в строку с использованием схемы кодирования Base64.
+        return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage)));
     }
 }

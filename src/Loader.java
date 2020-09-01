@@ -4,14 +4,17 @@ public class Loader {
     public static void main(String[] args) throws Exception {
         AESCipher cipher = new AESCipher();
 
-        String text = "Something new more thn 16 symbols";
-        String key = "some 16 symbols.";
+        String key = "myNameIsArtyomOk";
+        String message = "Тот кого нельзя называть, вернулся";
 
-        byte[] cipherBytes = cipher.encryptMessage(text, key);
-        String originalMessage = cipher.decryptMessage(cipherBytes, key);
+        String cipherString = cipher.encryptMessage(message, key);
+        String originalMessage = cipher.decryptMessage(cipherString, key);
 
-        System.out.println(text);
-        System.out.println(Arrays.toString(cipherBytes));
+        System.out.println(message);
+        System.out.println(cipherString);
         System.out.println(originalMessage);
+
+
     }
+
 }
