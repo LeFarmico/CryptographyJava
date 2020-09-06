@@ -3,8 +3,12 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.LinkedList;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class AESCipher implements MessageEncryption {
 
@@ -25,12 +29,14 @@ public class AESCipher implements MessageEncryption {
         rawKey = sha.digest(rawKey);
         rawKey = Arrays.copyOf(rawKey, 16);
 
-        //Используем этот класс для создание итогового ключа на основе rawKey
+        //Используем этот класс для кодировки ключа на основе rawKey
         spec = new SecretKeySpec(rawKey, "AES");
     }
 
     @Override
     public String encryptMessage(String message, String key) throws GeneralSecurityException {
+
+        String[] messageParts = message.split("(?<=\\G.{16})");
 
         setKey(key);
 
@@ -42,7 +48,6 @@ public class AESCipher implements MessageEncryption {
 
         //Кодируем указанный массив байтов в строку с использованием схемы кодирования Base64.
         return  Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
-
     }
 
     @Override
