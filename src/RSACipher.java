@@ -15,11 +15,12 @@ public class RSACipher implements MessageEncryption {
     KeyPair pair;
     PublicKey publicKey;
     PrivateKey privateKey;
-    Cipher cipher = Cipher.getInstance("RSA");
+    Cipher cipher;
 
     public RSACipher(int keyLength) throws NoSuchAlgorithmException, NoSuchPaddingException {
         this.keyGen = KeyPairGenerator.getInstance("RSA");
         this.keyGen.initialize(keyLength);
+        this.cipher = Cipher.getInstance("RSA");
     }
     public void generateKey(){
         this.pair = keyGen.generateKeyPair();
@@ -27,32 +28,37 @@ public class RSACipher implements MessageEncryption {
         this.publicKey = pair.getPublic();
     }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
+    public String getPublicKey() {
+        return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
-    }
-
-    @Override
-    public String encryptMessage(String message, String key) throws GeneralSecurityException {
-        return null;
+    public String getPrivateKey() {
+        return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
     @Override
-    public String decryptMessage(String encrypted, String key) throws GeneralSecurityException {
-        return null;
-    }
-    public String encryptText(String msg, PrivateKey key)
-            throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
-        this.cipher.init(Cipher.ENCRYPT_MODE, key);
-        return  Base64.getEncoder().encodeToString(cipher.doFinal(msg.getBytes(StandardCharsets.UTF_8)));
+    public String encryptMessage(String message, String key)
+            throws BadPaddingException, IllegalBlockSizeException,
+            InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] keyBytes = Base64.getDecoder().decode(key); //PRIVATE KEY!!!
+        //Кодировка закрытого ключа
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PrivateKey privateKey = keyFactory.generatePrivate(spec);
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+        return  Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decryptText(String msg, PublicKey key)
-            throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
-        this.cipher.init(Cipher.DECRYPT_MODE, key);
-        return new String(cipher.doFinal(Base64.getDecoder().decode(msg)));
+    @Override
+    public String decryptMessage(String encrypted, String key)
+            throws BadPaddingException, IllegalBlockSizeException,
+            InvalidKeyException, NoSuchAlgorithmException, InvalidKeySpecException {
+        byte[] keyBytes = Base64.getDecoder().decode(key);//PUBLIC KEY!!!
+        //Кодировка открытого ключа
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(spec);
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        return new String(cipher.doFinal(Base64.getDecoder().decode(encrypted)));
     }
 }
