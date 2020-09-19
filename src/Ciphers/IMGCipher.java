@@ -1,3 +1,5 @@
+package Ciphers;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -5,16 +7,17 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
-public class IMGCipher implements MessageEncryption{
+public class IMGCipher implements MessageEncryption {
 
     File file;
     String keyString;
 
-    public IMGCipher(File file) {
+    public IMGCipher(File file) throws IOException {
         this.file = file;
+        generateKey(file);
     }
 
-    public void generateKey() throws IOException {
+    public void generateKey(File file) throws IOException {
         FileInputStream inputStream = new FileInputStream(file);
         byte[] rawKey = inputStream.readAllBytes();
         keyString = Base64.getEncoder().encodeToString(rawKey);
