@@ -26,15 +26,16 @@ public class RSAKeyType {
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
 
-        Path publicKeyPath = Paths.get("src\\KeyStorage\\publicRSAKey.txt");
         Path privateKeyPath = Paths.get("src\\KeyStorage\\privateRSAKey.txt");
-        try (BufferedWriter writer = Files.newBufferedWriter(publicKeyPath, StandardCharsets.UTF_8)){
-            writer.write(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (BufferedWriter writer = Files.newBufferedWriter(privateKeyPath, StandardCharsets.UTF_8)){
-            writer.write(Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+        Path publicKeyPath = Paths.get("src\\KeyStorage\\publicRSAKey.txt");
+
+        writeKeyToFile(publicKeyPath, publicKey);
+        writeKeyToFile(privateKeyPath, privateKey);
+    }
+
+    private void writeKeyToFile(Path pathToFile, Key key) {
+        try (BufferedWriter writer = Files.newBufferedWriter(pathToFile, StandardCharsets.UTF_8)){
+            writer.write(Base64.getEncoder().encodeToString(key.getEncoded()));
         } catch (IOException e) {
             e.printStackTrace();
         }

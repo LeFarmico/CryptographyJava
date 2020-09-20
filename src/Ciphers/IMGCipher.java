@@ -2,17 +2,15 @@ package Ciphers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
 import java.util.Base64;
 
 public class IMGCipher implements MessageEncryption {
 
     @Override
-    public String encryptMessage(String message, File key) throws GeneralSecurityException, IOException {
-        FileInputStream inputStream = new FileInputStream(key);
+    public String encryptMessage(String message, File keyFile) throws IOException {
+        FileInputStream inputStream = new FileInputStream(keyFile);
         byte[] keyBytes = inputStream.readAllBytes();
         byte[] msgBytes = message.getBytes(StandardCharsets.UTF_8);
         byte[] encryptedBytes = new byte[msgBytes.length];
@@ -23,9 +21,9 @@ public class IMGCipher implements MessageEncryption {
     }
 
     @Override
-    public String decryptMessage(String encrypted, File key) throws GeneralSecurityException, IOException {
+    public String decryptMessage(String encrypted, File keyFile) throws IOException {
         byte[] encryptedBytes = Base64.getDecoder().decode(encrypted);
-        FileInputStream inputStream = new FileInputStream(key);
+        FileInputStream inputStream = new FileInputStream(keyFile);
         byte[] keyBytes = inputStream.readAllBytes();
         byte[] originalBytes = new byte[encryptedBytes.length];
         for (int i = 0; i < encryptedBytes.length; i++) {

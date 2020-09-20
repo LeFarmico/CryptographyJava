@@ -27,31 +27,31 @@ public class RSACipher implements MessageEncryption {
     }
 
     @Override
-    public String encryptMessage(String message, File publicKey)
+    public String encryptMessage(String message, File keyFile)
             throws BadPaddingException, IllegalBlockSizeException,
             InvalidKeyException, InvalidKeySpecException {
         String pubKeyLine = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(publicKey.getPath()), StandardCharsets.UTF_8)){
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(keyFile.getPath()), StandardCharsets.UTF_8)){
               pubKeyLine += reader.readLine();
         }catch (IOException e){
             e.printStackTrace();
         }
-             byte[] keyBytes = Base64.getDecoder().decode(pubKeyLine); //PUBLIC KEY!!!
+         byte[] keyBytes = Base64.getDecoder().decode(pubKeyLine); //PUBLIC KEY!!!
 
-             //Кодировка открытого ключа
-             X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-             PublicKey key = keyFactory.generatePublic(spec);
-             cipher.init(Cipher.ENCRYPT_MODE, key);
+         //Кодировка открытого ключа
+         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+         PublicKey key = keyFactory.generatePublic(spec);
+         cipher.init(Cipher.ENCRYPT_MODE, key);
         return Base64.getEncoder().encodeToString(cipher.doFinal(message.getBytes(StandardCharsets.UTF_8)));
     }
 
     @Override
-    public String decryptMessage(String encrypted, File privateKey)
+    public String decryptMessage(String encrypted, File keyFile)
             throws BadPaddingException, IllegalBlockSizeException,
             InvalidKeyException, InvalidKeySpecException {
 
         String privateKeyLine = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(privateKey.getPath()), StandardCharsets.UTF_8)){
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(keyFile.getPath()), StandardCharsets.UTF_8)){
             privateKeyLine += reader.readLine();
         }catch (IOException e){
             e.printStackTrace();

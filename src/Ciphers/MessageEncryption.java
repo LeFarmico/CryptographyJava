@@ -5,6 +5,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public interface MessageEncryption {
-    String encryptMessage(String message, File key) throws GeneralSecurityException, IOException;
-    String decryptMessage(String encrypted, File key) throws GeneralSecurityException, IOException;
+    String encryptMessage(String message, File keyFile) throws GeneralSecurityException, IOException;
+    String decryptMessage(String encrypted, File keyFile) throws GeneralSecurityException, IOException;
 }

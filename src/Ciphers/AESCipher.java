@@ -24,13 +24,8 @@ public class AESCipher implements MessageEncryption {
     }
 
     @Override
-    public String encryptMessage(String message, File key) throws GeneralSecurityException {
-        String secretKeyLine = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(key.getPath()), StandardCharsets.UTF_8)){
-            secretKeyLine += reader.readLine();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+    public String encryptMessage(String message, File keyFile) throws GeneralSecurityException {
+        String secretKeyLine = changeToString(keyFile);
         byte[] rawKey = Base64.getDecoder().decode(secretKeyLine);
         //Используем этот класс для кодировки ключа на основе rawKey
         spec = new SecretKeySpec(rawKey, "AES");
@@ -41,18 +36,23 @@ public class AESCipher implements MessageEncryption {
     }
 
     @Override
-    public String decryptMessage(String encryptedMessage, File key) throws GeneralSecurityException {
-        String secretKeyLine = "";
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(key.getPath()), StandardCharsets.UTF_8)){
-            secretKeyLine += reader.readLine();
-        }catch (IOException e){
-            e.printStackTrace();
-        }
+    public String decryptMessage(String encryptedMessage, File keyFile) throws GeneralSecurityException {
+        String secretKeyLine = changeToString(keyFile);
         byte[] rawKey = Base64.getDecoder().decode(secretKeyLine);
         //Используем этот класс для кодировки ключа на основе rawKey
         spec = new SecretKeySpec(rawKey, "AES");
         cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(new byte[16]));
         //Декодируем указанный массив байтов в строку с использованием схемы кодирования Base64.
         return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage)));
+    }
+
+    private String changeToString(File keyFile) {
+        String secretKeyLine = "";
+        try (BufferedReader reader = Files.newBufferedReader(Paths.get(keyFile.getPath()), StandardCharsets.UTF_8)) {
+            secretKeyLine += reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return secretKeyLine;
     }
 }
