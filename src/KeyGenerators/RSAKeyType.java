@@ -18,16 +18,16 @@ public class RSAKeyType {
     public RSAKeyType(int keyLength) throws NoSuchAlgorithmException{
         this.keyGen = KeyPairGenerator.getInstance("RSA");
         this.keyGen.initialize(keyLength);
-        generateKey();
+        generate();
     }
 
-    public void generateKey() {
+    public void generate() {
         this.pair = keyGen.generateKeyPair();
         this.privateKey = pair.getPrivate();
         this.publicKey = pair.getPublic();
 
-        Path publicKeyPath = Paths.get("src\\publicRSAKey.txt");
-        Path privateKeyPath = Paths.get("src\\privateRSAKey.txt");
+        Path publicKeyPath = Paths.get("src\\KeyStorage\\publicRSAKey.txt");
+        Path privateKeyPath = Paths.get("src\\KeyStorage\\privateRSAKey.txt");
         try (BufferedWriter writer = Files.newBufferedWriter(publicKeyPath, StandardCharsets.UTF_8)){
             writer.write(Base64.getEncoder().encodeToString(publicKey.getEncoded()));
         } catch (IOException e) {
