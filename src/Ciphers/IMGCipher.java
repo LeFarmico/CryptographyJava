@@ -2,6 +2,7 @@ package Ciphers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -9,23 +10,10 @@ import java.util.Base64;
 
 public class IMGCipher implements MessageEncryption {
 
-    File file;
-    String keyString;
-
-    public IMGCipher(File file) throws IOException {
-        this.file = file;
-        generateKey(file);
-    }
-
-    public void generateKey(File file) throws IOException {
-        FileInputStream inputStream = new FileInputStream(file);
-        byte[] rawKey = inputStream.readAllBytes();
-        keyString = Base64.getEncoder().encodeToString(rawKey);
-    }
-
     @Override
-    public String encryptMessage(String message, String key) throws GeneralSecurityException {
-        byte[] keyBytes = Base64.getDecoder().decode(key);
+    public String encryptMessage(String message, File key) throws GeneralSecurityException, IOException {
+        FileInputStream inputStream = new FileInputStream(key);
+        byte[] keyBytes = inputStream.readAllBytes();
         byte[] msgBytes = message.getBytes(StandardCharsets.UTF_8);
         byte[] encryptedBytes = new byte[msgBytes.length];
         for (int i = 0; i < msgBytes.length; i++) {
@@ -35,9 +23,10 @@ public class IMGCipher implements MessageEncryption {
     }
 
     @Override
-    public String decryptMessage(String encrypted, String key) throws GeneralSecurityException {
+    public String decryptMessage(String encrypted, File key) throws GeneralSecurityException, IOException {
         byte[] encryptedBytes = Base64.getDecoder().decode(encrypted);
-        byte[] keyBytes = Base64.getDecoder().decode(key);
+        FileInputStream inputStream = new FileInputStream(key);
+        byte[] keyBytes = inputStream.readAllBytes();
         byte[] originalBytes = new byte[encryptedBytes.length];
         for (int i = 0; i < encryptedBytes.length; i++) {
             originalBytes[i] = (byte) (encryptedBytes[i] ^ keyBytes[i]);

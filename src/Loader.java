@@ -1,6 +1,8 @@
+import Ciphers.RSACipher;
 import KeyGenerators.AESKeyType;
 import KeyGenerators.RSAKeyType;
 
+import java.io.File;
 import java.util.Base64;
 
 public class Loader {
@@ -10,30 +12,33 @@ public class Loader {
 
         String key = "abcdefghijklmnop";
         String message = "тот кого нельзя называть, вернулся и он очень очень зол";
-        CipherFactory factory = new CipherFactory();
-        AESKeyType AESKey = new AESKeyType(key);
-        RSAKeyType RSAKey = new RSAKeyType(1024);
+        CipherFactory cipherFactory = new CipherFactory();
 
-//        Ciphers.MessageEncryption RSA = factory.getCipher(CipherType.RSA);
-//        String RSAEncrypted = RSA.encryptMessage(message, RSAKey.getPublicKey());
-//        String RSADecrypted = RSA.decryptMessage(RSAEncrypted, RSAKey.getPrivateKey());
-//        System.out.println("Original message: " + message);
-//        System.out.println("Encrypted message: " + RSAEncrypted);
-//        System.out.println("Decrypted message: " + RSADecrypted + "\n");
+        File pubKey = new File("src/publicRSAKey.txt");
+        File prvKey = new File("src/privateRSAKey.txt");
+        File secKey = new File("src/secretAESKey.txt");
+        File imgKey = new File("src/Image_key.png");
 
-//        Ciphers.MessageEncryption AES = factory.getCipher(CipherType.AES);
-//        String AESEncrypted = AES.encryptMessage(message, AESKey.generateKey());
-//        String AESDecrypted = AES.decryptMessage(AESEncrypted, AESKey.generateKey());
-//        System.out.println("Original message: " + message);
-//        System.out.println("Encrypted message: " + AESEncrypted);
-//        System.out.println("Decrypted message: " + AESDecrypted + "\n");
+        Ciphers.MessageEncryption RSA = cipherFactory.getCipher(CipherType.RSA);
+        String RSAEncrypted = RSA.encryptMessage(message, pubKey);
+        String RSADecrypted = RSA.decryptMessage(RSAEncrypted, prvKey);
+        System.out.println("Original message: " + message);
+        System.out.println("Encrypted message: " + RSAEncrypted);
+        System.out.println("Decrypted message: " + RSADecrypted + "\n");
 
-//        Ciphers.MessageEncryption IMG = factory.getCipher(CipherType.IMG);
-//        String IMGEncrypted = IMG.encryptMessage(message, IMG.keyString);
-//        String IMGDecrypted = IMG.decryptMessage(IMGEncrypted, IMG.keyString);
-//        System.out.println("Original message: " + message);
-//        System.out.println("Encrypted message: " + IMGEncrypted);
-//        System.out.println("Decrypted message: " + IMGDecrypted + "\n");
+        Ciphers.MessageEncryption AES = cipherFactory.getCipher(CipherType.AES);
+        String AESEncrypted = AES.encryptMessage(message, secKey);
+        String AESDecrypted = AES.decryptMessage(AESEncrypted, secKey);
+        System.out.println("Original message: " + message);
+        System.out.println("Encrypted message: " + AESEncrypted);
+        System.out.println("Decrypted message: " + AESDecrypted + "\n");
+
+        Ciphers.MessageEncryption IMG = cipherFactory.getCipher(CipherType.IMG);
+        String IMGEncrypted = IMG.encryptMessage(message, imgKey);
+        String IMGDecrypted = IMG.decryptMessage(IMGEncrypted, imgKey);
+        System.out.println("Original message: " + message);
+        System.out.println("Encrypted message: " + IMGEncrypted);
+        System.out.println("Decrypted message: " + IMGDecrypted + "\n");
 
     }
 

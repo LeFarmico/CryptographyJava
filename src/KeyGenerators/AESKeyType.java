@@ -1,6 +1,11 @@
 package KeyGenerators;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -19,7 +24,7 @@ public class AESKeyType {
         generateKey();
     }
 
-    public String generateKey() {
+    public void generateKey() {
         //Создание байт ключа на основе key
         byte[] rawKey = sixteenSymbolsKey.getBytes(StandardCharsets.UTF_8);
         if (rawKey.length != 16)
@@ -27,6 +32,12 @@ public class AESKeyType {
         //Вычисляем дайджест
         rawKey = sha.digest(rawKey);
         rawKey = Arrays.copyOf(rawKey, 16);
-        return Base64.getEncoder().encodeToString(rawKey);
+
+        Path secretKeyPath = Paths.get("src\\secretAESKey.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(secretKeyPath, StandardCharsets.UTF_8)){
+            writer.write(Base64.getEncoder().encodeToString(rawKey));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
